@@ -1,0 +1,18 @@
+import os 
+
+MAX_LEN = 512
+DO_TRAIN = True
+SEED = 42
+LEARNING_RATE = 5e-5
+ADAM_EPSILON = 1e-8
+EPOCHS = 10
+WARMUP_PROPORTION = 0.1
+WEIGHT_DECAY = 0.01
+LOGGING_STEPS = 1000
+TRAIN_BATCH_SIZE = 8
+EVAL_BATCH_SIZE = 64
+DEVICE = "cuda"
+MAX_GRAD_NORM = 1.0
+EARLYSTOP_PATIENCE = 2000
+TASK_NAME = "ee"
+OUTPUT_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE/output/"
