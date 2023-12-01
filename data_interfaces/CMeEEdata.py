@@ -70,9 +70,12 @@ class MyEEDataset(EEDataset):
 
 def test():
   from transformers import AutoTokenizer
-  t1 = MyEEDataset(os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE", tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese"), type="train", mode="train")
-  t2 = MyEEDataset(os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE", tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese"), type="eval", mode="train")
-  t3 = MyEEDataset(os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE", tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese"), type="test", mode="test")
+  train = MyEEDataset(os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE", tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese"), type="train", mode="train")
+  eval = MyEEDataset(os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE", tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese"), type="eval", mode="train")
+  test = MyEEDataset(os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE", tokenizer = AutoTokenizer.from_pretrained("bert-base-chinese"), type="test", mode="test")
+  assert(train)
+  assert(eval)
+  assert(test)
 
 if __name__ == "main":
   test()
