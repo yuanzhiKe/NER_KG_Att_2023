@@ -2,6 +2,9 @@
 *.txt
 *.json
 *.pyc
+*.ipynb
+*.csv
+*.log
 CMeEE
 CMeEE-V2
 commit
