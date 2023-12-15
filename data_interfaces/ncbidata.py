@@ -9,6 +9,7 @@ class NCBIDataset(Dataset):
         super().__init__()
         self.is_roberta = is_roberta
         self.data_ids = []
+        self.data_tokens = []
         self.input_ids = []
         if not self.is_roberta:
             self.token_type_ids = []
@@ -21,6 +22,7 @@ class NCBIDataset(Dataset):
     def preprocess(self, ncbi_data):
         for data in ncbi_data:
             self.data_ids.append(data["id"])
+            self.data_tokens.append(data["tokens"])
             input_ids = [101]  # start with <cls>
             if not self.is_roberta:
                 token_type_ids = [0]
