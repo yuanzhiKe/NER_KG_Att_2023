@@ -125,6 +125,42 @@ def perform_oa():
     logging.info("OA model tested.")
 
 
+def get_outputs(model, tokenizer, test_dataset):
+    test_trainer = NCBITrainer(
+        model=model,
+        tokenizer=tokenizer,
+        train_dataset=None,
+        eval_dataset=test_dataset,
+        task_name="ncbi",
+        my_model_name=model.my_model_name,
+    )
+    test_trainer.evaluate(model=model, output_results=True)
+
+
+def output_pick_comp():
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    base_model = NER_Model(model_name, num_labels=3, my_model_name="NCBI_BERT_BASE")
+    sa_model = NER_Model_SA(model_name, num_labels=3, my_model_name="NCBI_BERT_SA")
+    oa_model = NER_Model_OA(
+        model_name,
+        num_labels=3,
+        my_model_name="NCBI_BERT_OA",
+        ontology=EN_Ontology_tree().get_dfs_encoded_str(),
+        tokenizer=tokenizer,
+        device=DEVICE,
+    )
+    base_model.load_pretrained(OUTPUT_DIR)
+    sa_model.load_pretrained(OUTPUT_DIR)
+    oa_model.load_pretrained(OUTPUT_DIR)
+
+    dataset = datasets.load_dataset("ncbi_disease")
+    test_dataset = NCBIDataset(dataset["test"], tokenizer, MAX_LEN)
+
+    get_outputs(base_model, tokenizer, test_dataset)
+    get_outputs(sa_model, tokenizer, test_dataset)
+    get_outputs(oa_model, tokenizer, test_dataset)
+
+
 if __name__ == "__main__":
     stream_handler = StreamHandler()
     stream_handler.setLevel(INFO)
@@ -142,6 +178,7 @@ if __name__ == "__main__":
     )
 
     logging.basicConfig(level=NOTSET, handlers=[stream_handler, file_handler])
-    perform_base()
-    perform_sa()
-    perform_oa()
+    # perform_base()
+    # perform_sa()
+    # perform_oa()
+    output_pick_comp()
