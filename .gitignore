@@ -5,7 +5,6 @@
 *.ipynb
 *.csv
 *.log
-CMeEE
-CMeEE-V2
 commit
 notebooks
+datasets
