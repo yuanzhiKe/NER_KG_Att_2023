@@ -17,33 +17,31 @@ class EN_Ontology_tree:
         ontology_tree.create_node("symptom property", parent="sympton")
         ontology_tree.create_node("symptom timing", parent="sympton")
 
-        ontology_tree.create_node(
-            "medical equipment", "medical equipment", parent="root"
-        )
-        ontology_tree.create_node("equipment name", parent="medical equipment")
-        ontology_tree.create_node(
-            "symptoms suitable for use", parent="medical equipment"
-        )
-        ontology_tree.create_node(
-            "operational requirements", parent="medical equipment"
-        )
+        # ontology_tree.create_node(
+        #     "medical equipment", "medical equipment", parent="root"
+        # )
+        # ontology_tree.create_node("equipment name", parent="medical equipment")
+        # ontology_tree.create_node(
+        #     "symptoms suitable for use", parent="medical equipment"
+        # )
+        # ontology_tree.create_node(
+        #     "operational requirements", parent="medical equipment"
+        # )
 
-        ontology_tree.create_node(
-            "anatomical location", "anatomical location", parent="root"
-        )
+        ontology_tree.create_node("body", "anatomical location", parent="root")
         ontology_tree.create_node("part name", parent="anatomical location")
         ontology_tree.create_node("anatomy", parent="anatomical location")
         ontology_tree.create_node("anatomical property", parent="anatomical location")
 
-        ontology_tree.create_node(
-            "hospital department", "hospital department", parent="root"
-        )
-        ontology_tree.create_node("department name", parent="hospital department")
-        ontology_tree.create_node(
-            "departmental functions", parent="hospital department"
-        )
-        ontology_tree.create_node("service object", parent="hospital department")
-        ontology_tree.create_node("range of action", parent="hospital department")
+        # ontology_tree.create_node(
+        #     "hospital department", "hospital department", parent="root"
+        # )
+        # ontology_tree.create_node("department name", parent="hospital department")
+        # ontology_tree.create_node(
+        #     "departmental functions", parent="hospital department"
+        # )
+        # ontology_tree.create_node("service object", parent="hospital department")
+        # ontology_tree.create_node("range of action", parent="hospital department")
 
         ontology_tree.create_node("microbe", "microbe", parent="root")
         ontology_tree.create_node("microbial name", parent="microbe")
