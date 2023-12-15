@@ -25,6 +25,7 @@ from configs.ncbi_config import (
     EVAL_BATCH_SIZE,
     SEED,
 )
+from datetime import datetime
 
 
 class NCBITrainer(object):
@@ -159,12 +160,25 @@ class NCBITrainer(object):
 
         return input_ids, token_type_ids, attention_mask, labels
 
-    def evaluate(self, model):
+    def get_token(self, id):
+        token = self.tokenizer.convert_ids_to_tokens(int(id))
+        if token in ["[CLS]", "[SEP]", "[PAD]"]:
+            return ""
+        else:
+            return token
+
+    def evaluate(self, model, output_results=False):
+        model.to(DEVICE)
         eval_dataloader = self.get_eval_dataloader()
         num_examples = len(eval_dataloader.dataset)
 
         preds = None
         eval_labels = None
+
+        if output_results:
+            preds_for_output = None
+            labels_for_output = None
+            input_ids_for_output = None
 
         logging.info("***** Running evaluation *****")
         logging.info("Num samples %d", num_examples)
@@ -184,21 +198,78 @@ class NCBITrainer(object):
                 )
 
                 # outputs = model(labels=labels, **inputs)
-                loss, logits = outputs[:2]
-                # active_index = inputs['attention_mask'].view(-1) == 1
+                _, _logits = outputs[:2]
+                if output_results:
+                    active_logits_2d = _logits.argmax(dim=-1)
+                    local_preds_2d = active_logits_2d.detach().cpu().numpy()
+                    local_labels_2d = labels.detach().cpu().numpy()
+                    local_input_ids = input_ids.detach().cpu().numpy()
+
                 active_index = attention_mask.view(-1) == 1
                 active_labels = labels.view(-1)[active_index]
-                logits = logits.argmax(dim=-1)
+                logits = _logits.argmax(dim=-1)
                 active_logits = logits.view(-1)[active_index]
+                local_preds = active_logits.detach().cpu().numpy()
+                local_labels = active_labels.detach().cpu().numpy()
 
             if preds is None:
-                preds = active_logits.detach().cpu().numpy()
-                eval_labels = active_labels.detach().cpu().numpy()
+                preds = local_preds
+                eval_labels = local_labels
+                if output_results:
+                    preds_for_output = local_preds_2d
+                    labels_for_output = local_labels_2d
+                    input_ids_for_output = local_input_ids
             else:
-                preds = np.append(preds, active_logits.detach().cpu().numpy(), axis=0)
-                eval_labels = np.append(
-                    eval_labels, active_labels.detach().cpu().numpy(), axis=0
-                )
+                preds = np.append(preds, local_preds, axis=0)
+                eval_labels = np.append(eval_labels, local_labels, axis=0)
+                if output_results:
+                    preds_for_output = np.append(
+                        preds_for_output, local_preds_2d, axis=0
+                    )
+                    labels_for_output = np.append(
+                        labels_for_output, local_labels_2d, axis=0
+                    )
+                    input_ids_for_output = np.append(
+                        input_ids_for_output, local_input_ids, axis=0
+                    )
+
+        if output_results:
+            output_text = ""
+            with open(
+                os.path.join(
+                    OUTPUT_DIR,
+                    f"eval_outputs_{self.my_model_name}_{datetime.now():%Y%m%d%H%M%S}.txt",
+                ),
+                "w",
+            ) as f:
+                for i in range(preds_for_output.shape[0]):
+                    output_text += f"ID: {self.eval_dataset.data_ids[i]} \t"
+                    last_tag = 2
+                    for j in range(preds_for_output.shape[1]):
+                        if preds_for_output[i][j] == 1 and last_tag != 1:
+                            token = self.get_token(int(input_ids_for_output[i][j]))
+                            output_text += f"<S>{token}"
+                            last_tag = preds_for_output[i][j]
+                        elif preds_for_output[i][j] == 2 or preds_for_output[i][j] == 1:
+                            token = self.get_token(int(input_ids_for_output[i][j]))
+                            output_text += f"{token}"
+                            last_tag = preds_for_output[i][j]
+                    output_text += "\n"
+                    output_text += "Gr T: \t"
+                    last_tag = 2
+                    for j in range(labels_for_output.shape[1]):
+                        if labels_for_output[i][j] == 1 and last_tag != 1:
+                            token = self.get_token(int(input_ids_for_output[i][j]))
+                            output_text += f"<S>{token}"
+                            last_tag = preds_for_output[i][j]
+                        elif (
+                            labels_for_output[i][j] == 2 or preds_for_output[i][j] == 1
+                        ):
+                            token = self.get_token(int(input_ids_for_output[i][j]))
+                            output_text += f"{token}"
+                            last_tag = preds_for_output[i][j]
+                    output_text += "\n\n"
+                f.write(output_text)
 
         p, r, f1, _ = ee_metric(preds, eval_labels)
         logging.info(
