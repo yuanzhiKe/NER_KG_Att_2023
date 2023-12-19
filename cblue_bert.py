@@ -9,9 +9,13 @@ def download_cblue_package():
         subprocess.call(
             ["git", "clone", "git@github.com:CBLUEbenchmark/CBLUE.git", cblue_path]
         )
+    return cblue_path
 
 
-download_cblue_package()
+cblue_path = download_cblue_package()
+
+import sys
+sys.path.append(os.path.join(cblue_path))
 
 import logging
 import datasets
