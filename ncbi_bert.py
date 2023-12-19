@@ -1,5 +1,4 @@
 import os
-import sys
 import logging
 import datasets
 from transformers import AutoTokenizer
@@ -11,7 +10,7 @@ from data_interfaces.ncbidata import NCBIDataset
 from tree.english_ontology import EN_Ontology_tree
 from datetime import datetime
 from logging import StreamHandler, FileHandler, Formatter
-from logging import INFO, DEBUG, NOTSET
+from logging import INFO, NOTSET
 
 
 def perform_base():

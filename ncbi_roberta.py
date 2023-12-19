@@ -11,7 +11,7 @@ from data_interfaces.ncbidata import NCBIDataset
 from tree.english_ontology import EN_Ontology_tree
 from datetime import datetime
 from logging import StreamHandler, FileHandler, Formatter
-from logging import INFO, DEBUG, NOTSET
+from logging import INFO, NOTSET
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, force=True)
 
