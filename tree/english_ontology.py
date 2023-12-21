@@ -65,14 +65,14 @@ class EN_Ontology_tree:
         for n in self.tree.expand_tree(nid="root", mode=Tree.DEPTH): # If @key is None sorting is performed on node tag.
             if self.tree[n].tag != "root":
                 encoded_str.append(self.tree[n].tag)
-        return " ".join(encoded_str)[1:]  # [1:] to drop the first space
+        return " ".join(encoded_str).strip()
     
     def get_post_order_encoded_str(self):
         tree = self.tree
-        root = tree.get_node("root")
+        root = "root"
         # WIP
         # https://zhuanlan.zhihu.com/p/566673074
-        ans = []
+        encoded_str = []
         stack = []
         nextIndex = defaultdict(int)
         node = root
@@ -82,18 +82,21 @@ class EN_Ontology_tree:
                 if not tree.children(node):
                     break
                 nextIndex[node] = 1
-                node = node.children[0]
+                node = tree.children(node)[0].identifier
             node = stack[-1]
             i = nextIndex[node]
-            if i < len(node.children):
+            if i < len(tree.children(node)):
                 nextIndex[node] = i + 1
-                node = node.children[i]
+                node = tree.children(node)[i].identifier
             else:
-                ans.append(node.val)
+                encoded_str.append(tree.get_node(node).tag)
                 stack.pop()
                 del nextIndex[node]
                 node = None
-        return ans
+        return " ".join(encoded_str).strip()
 
     def get_pre_post_order_encoded_str(self):
-        return self.get_dfs_encoded_str + " " + self.get_post_order_encoded_str
+        return self.get_dfs_encoded_str() + " " + self.get_post_order_encoded_str()
+
+if __name__=="__main__":
+    print(EN_Ontology_tree().get_pre_post_order_encoded_str())

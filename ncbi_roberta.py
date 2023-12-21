@@ -1,5 +1,22 @@
 import os
+import subprocess
+
+
+def download_cblue_package():
+    project_path = os.path.dirname(__file__)
+    cblue_path = os.path.join(project_path, "CBLUE")
+    if not os.path.exists(cblue_path):
+        subprocess.call(
+            ["git", "clone", "git@github.com:CBLUEbenchmark/CBLUE.git", cblue_path]
+        )
+    return cblue_path
+
+
+cblue_path = download_cblue_package()
+
 import sys
+sys.path.append(os.path.join(cblue_path))
+
 import logging
 import datasets
 from transformers import AutoTokenizer
@@ -99,8 +116,17 @@ def perform_sa():
     logging.info("SA model tested.")
 
 
-def perform_oa():
-    ontology = EN_Ontology_tree().get_dfs_encoded_str()
+def perform_oa(ontology_order="Pre"):
+    if ontology_order == "Pre":
+        ontology = EN_Ontology_tree().get_dfs_encoded_str()
+    elif ontology_order == "Post":
+        ontology = EN_Ontology_tree().get_post_order_encoded_str()
+    elif ontology_order == "Bi":
+        ontology = EN_Ontology_tree().get_pre_post_order_encoded_str()
+    else:
+        logging.warn("Unavailabe ontology order, using pre-order DFS")
+        ontology = EN_Ontology_tree().get_dfs_encoded_str()
+
     my_model_name = "NCBI_ROBERTA_OA"
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
@@ -161,6 +187,8 @@ if __name__ == "__main__":
     )
 
     logging.basicConfig(level=NOTSET, handlers=[stream_handler, file_handler])
-    perform_base()
-    perform_sa()
-    perform_oa()
+    # perform_base()
+    # perform_sa()
+    # perform_oa()
+    perform_oa("Post")
+    perform_oa("Bi")
