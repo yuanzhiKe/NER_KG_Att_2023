@@ -110,7 +110,7 @@ def perform_oa(ontology_order="Pre"):
         logging.warn("Unavailabe ontology order, using pre-order DFS")
         ontology = EN_Ontology_tree().get_dfs_encoded_str()
 
-    my_model_name = "NCBI_BERT_OA"
+    my_model_name = "NCBI_BERT_OA" + "_" + ontology_order
     dataset = datasets.load_dataset("ncbi_disease")
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
