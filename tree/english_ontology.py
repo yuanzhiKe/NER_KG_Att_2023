@@ -1,4 +1,5 @@
 from treelib import Node, Tree
+from collections import defaultdict
 
 
 class EN_Ontology_tree:
@@ -17,31 +18,31 @@ class EN_Ontology_tree:
         ontology_tree.create_node("symptom property", parent="sympton")
         ontology_tree.create_node("symptom timing", parent="sympton")
 
-        # ontology_tree.create_node(
-        #     "medical equipment", "medical equipment", parent="root"
-        # )
-        # ontology_tree.create_node("equipment name", parent="medical equipment")
-        # ontology_tree.create_node(
-        #     "symptoms suitable for use", parent="medical equipment"
-        # )
-        # ontology_tree.create_node(
-        #     "operational requirements", parent="medical equipment"
-        # )
+        ontology_tree.create_node(
+            "medical equipment", "medical equipment", parent="root"
+        )
+        ontology_tree.create_node("equipment name", parent="medical equipment")
+        ontology_tree.create_node(
+            "symptoms suitable for use", parent="medical equipment"
+        )
+        ontology_tree.create_node(
+            "operational requirements", parent="medical equipment"
+        )
 
         ontology_tree.create_node("body", "anatomical location", parent="root")
         ontology_tree.create_node("part name", parent="anatomical location")
         ontology_tree.create_node("anatomy", parent="anatomical location")
         ontology_tree.create_node("anatomical property", parent="anatomical location")
 
-        # ontology_tree.create_node(
-        #     "hospital department", "hospital department", parent="root"
-        # )
-        # ontology_tree.create_node("department name", parent="hospital department")
-        # ontology_tree.create_node(
-        #     "departmental functions", parent="hospital department"
-        # )
-        # ontology_tree.create_node("service object", parent="hospital department")
-        # ontology_tree.create_node("range of action", parent="hospital department")
+        ontology_tree.create_node(
+            "hospital department", "hospital department", parent="root"
+        )
+        ontology_tree.create_node("department name", parent="hospital department")
+        ontology_tree.create_node(
+            "departmental functions", parent="hospital department"
+        )
+        ontology_tree.create_node("service object", parent="hospital department")
+        ontology_tree.create_node("range of action", parent="hospital department")
 
         ontology_tree.create_node("microbe", "microbe", parent="root")
         ontology_tree.create_node("microbial name", parent="microbe")
@@ -59,8 +60,39 @@ class EN_Ontology_tree:
         self.tree = ontology_tree
 
     def get_dfs_encoded_str(self):
+        # pre_order dfs
         encoded_str = []
-        for n in self.tree.expand_tree(nid="root", mode=Tree.DEPTH):
+        for n in self.tree.expand_tree(nid="root", mode=Tree.DEPTH): # If @key is None sorting is performed on node tag.
             if self.tree[n].tag != "root":
                 encoded_str.append(self.tree[n].tag)
         return " ".join(encoded_str)[1:]  # [1:] to drop the first space
+    
+    def get_post_order_encoded_str(self):
+        root = self.tree.get_node("root")
+        # WIP
+        # https://zhuanlan.zhihu.com/p/566673074
+        ans = []
+        stack = []
+        nextIndex = defaultdict(int)
+        node = root
+        while stack or node:
+            while node:
+                stack.append(node)
+                if not node.children:
+                    break
+                nextIndex[node] = 1
+                node = node.children[0]
+            node = stack[-1]
+            i = nextIndex[node]
+            if i < len(node.children):
+                nextIndex[node] = i + 1
+                node = node.children[i]
+            else:
+                ans.append(node.val)
+                stack.pop()
+                del nextIndex[node]
+                node = None
+        return ans
+
+    def get_pre_post_order_encoded_str(self):
+        return self.get_dfs_encoded_str + " " + self.get_post_order_encoded_str
