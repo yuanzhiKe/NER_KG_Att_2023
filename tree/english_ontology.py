@@ -68,7 +68,8 @@ class EN_Ontology_tree:
         return " ".join(encoded_str)[1:]  # [1:] to drop the first space
     
     def get_post_order_encoded_str(self):
-        root = self.tree.get_node("root")
+        tree = self.tree
+        root = tree.get_node("root")
         # WIP
         # https://zhuanlan.zhihu.com/p/566673074
         ans = []
@@ -78,7 +79,7 @@ class EN_Ontology_tree:
         while stack or node:
             while node:
                 stack.append(node)
-                if not node.children:
+                if not tree.children(node):
                     break
                 nextIndex[node] = 1
                 node = node.children[0]
