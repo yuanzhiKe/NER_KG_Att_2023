@@ -15,6 +15,7 @@ def download_cblue_package():
 cblue_path = download_cblue_package()
 
 import sys
+
 sys.path.append(os.path.join(cblue_path))
 
 import logging
@@ -127,7 +128,7 @@ def perform_oa(ontology_order="Pre"):
         logging.warn("Unavailabe ontology order, using pre-order DFS")
         ontology = EN_Ontology_tree().get_dfs_encoded_str()
 
-    my_model_name = "NCBI_ROBERTA_OA"
+    my_model_name = "NCBI_ROBERTA_OA" + " " + ontology_order
     tokenizer = AutoTokenizer.from_pretrained(model_name)
 
     train_dataset, eval_dataset, test_dataset = read_dataset(
