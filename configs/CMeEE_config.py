@@ -1,6 +1,5 @@
-import os 
-
 MAX_LEN = 512
+DUP_LEN = 16
 DO_TRAIN = True
 SEED = 42
 LEARNING_RATE = 5e-5
@@ -9,10 +8,10 @@ EPOCHS = 10
 WARMUP_PROPORTION = 0.1
 WEIGHT_DECAY = 0.01
 LOGGING_STEPS = 1000
-TRAIN_BATCH_SIZE = 8
+TRAIN_BATCH_SIZE = 16
 EVAL_BATCH_SIZE = 64
 DEVICE = "cuda"
 MAX_GRAD_NORM = 1.0
-EARLYSTOP_PATIENCE = 2000
-TASK_NAME = "ee"
-OUTPUT_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../CMeEE/output/"
+EARLYSTOP_PATIENCE = 5000
+model_name = "bert-base-uncased"
+OUTPUT_DIR = "cmeee_log/"

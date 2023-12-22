@@ -25,7 +25,7 @@ from models.ner_models import NER_Model_SA, NER_Model_OA
 from configs.ncbi_config import model_name, OUTPUT_DIR, MAX_LEN, DEVICE
 from train.trainer import NCBITrainer
 from data_interfaces.ncbidata import NCBIDataset
-from tree.english_ontology import EN_Ontology_tree
+from tree.ontology import EN_Ontology
 from datetime import datetime
 from logging import StreamHandler, FileHandler, Formatter
 from logging import INFO, NOTSET
@@ -101,14 +101,14 @@ def perform_sa():
 
 def perform_oa(ontology_order="Pre"):
     if ontology_order == "Pre":
-        ontology = EN_Ontology_tree().get_dfs_encoded_str()
+        ontology = EN_Ontology().get_dfs_encoded_str()
     elif ontology_order == "Post":
-        ontology = EN_Ontology_tree().get_post_order_encoded_str()
+        ontology = EN_Ontology().get_post_order_encoded_str()
     elif ontology_order == "Bi":
-        ontology = EN_Ontology_tree().get_pre_post_order_encoded_str()
+        ontology = EN_Ontology().get_pre_post_order_encoded_str()
     else:
         logging.warn("Unavailabe ontology order, using pre-order DFS")
-        ontology = EN_Ontology_tree().get_dfs_encoded_str()
+        ontology = EN_Ontology().get_dfs_encoded_str()
 
     my_model_name = "NCBI_BERT_OA" + "_" + ontology_order
     dataset = datasets.load_dataset("ncbi_disease")
@@ -171,7 +171,7 @@ def output_pick_comp():
         model_name,
         num_labels=3,
         my_model_name="NCBI_BERT_OA",
-        ontology=EN_Ontology_tree().get_dfs_encoded_str(),
+        ontology=EN_Ontology().get_dfs_encoded_str(),
         tokenizer=tokenizer,
         device=DEVICE,
     )
@@ -206,7 +206,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=NOTSET, handlers=[stream_handler, file_handler])
     # perform_base()
     # perform_sa()
-    # perform_oa()
+    perform_oa()
     perform_oa("Post")
     perform_oa("Bi")
     # output_pick_comp()

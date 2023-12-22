@@ -9,7 +9,7 @@ sys.path.append("..")
 from torch.utils.data import DataLoader
 from transformers import AdamW, get_linear_schedule_with_warmup
 from cblue.utils import ProgressBar, seed_everything
-from cblue.metrics import ee_metric
+from sklearn.metrics import precision_recall_fscore_support
 from configs.ncbi_config import (
     DEVICE,
     EPOCHS,
@@ -27,6 +27,8 @@ from configs.ncbi_config import (
 )
 from datetime import datetime
 
+def macro_f1(preds, labels):
+    return precision_recall_fscore_support(y_pred=preds, y_true=labels, average='macro')
 
 class NCBITrainer(object):
     def __init__(
@@ -38,6 +40,7 @@ class NCBITrainer(object):
         task_name,
         my_model_name,
         is_roberta=False,
+        output_dir = OUTPUT_DIR
     ):
         self.model = model
         self.tokenizer = tokenizer
@@ -46,6 +49,7 @@ class NCBITrainer(object):
         self.task_name = task_name
         self.my_model_name = my_model_name
         self.is_roberta = is_roberta
+        self.output_dir = output_dir
 
     def train(self):
         model = self.model
@@ -237,7 +241,7 @@ class NCBITrainer(object):
             output_text = ""
             with open(
                 os.path.join(
-                    OUTPUT_DIR,
+                    self.output_dir,
                     f"eval_outputs_{self.my_model_name}_{datetime.now():%Y%m%d%H%M%S}.txt",
                 ),
                 "w",
@@ -271,9 +275,9 @@ class NCBITrainer(object):
                     output_text += "\n\n"
                 f.write(output_text)
 
-        p, r, f1, _ = ee_metric(preds, eval_labels)
+        p, r, f1, _ = macro_f1(preds, eval_labels)
         logging.info(
-            "%s-%s precision: %s - recall: %s - f1 score: %s",
+            "%s-%s precision: %s - recall: %s - macro f1 score: %s",
             self.task_name,
             self.my_model_name,
             p,
@@ -283,7 +287,7 @@ class NCBITrainer(object):
         return f1
 
     def _save_checkpoint(self, model, step):
-        output_dir = os.path.join(OUTPUT_DIR, f"checkpoint-{self.my_model_name}-{step}")
+        output_dir = os.path.join(self.output_dir, f"checkpoint-{self.my_model_name}-{step}")
         if not os.path.exists(output_dir):
             os.makedirs(output_dir)
 
@@ -295,13 +299,13 @@ class NCBITrainer(object):
 
     def _save_best_checkpoint(self, best_step):
         model = self.model.load_pretrained(
-            os.path.join(OUTPUT_DIR, f"checkpoint-{self.my_model_name}-{best_step}")
+            os.path.join(self.output_dir, f"checkpoint-{self.my_model_name}-{best_step}")
         )
-        model.save_pretrained(OUTPUT_DIR)
+        model.save_pretrained(self.output_dir)
         self.tokenizer.save_vocabulary(
-            save_directory=OUTPUT_DIR, filename_prefix=self.my_model_name
+            save_directory=self.output_dir, filename_prefix=self.my_model_name
         )
-        logging.info("Saving models checkpoint to %s", OUTPUT_DIR)
+        logging.info("Saving models checkpoint to %s", self.output_dir)
 
     def training_step(self, model, item):
         model.train()
