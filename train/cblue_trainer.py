@@ -19,7 +19,8 @@ class CBLUETrainer(NCBITrainer):
         task_name,
         my_model_name,
         is_roberta=False,
-        output_dir=OUTPUT_DIR
+        output_dir=OUTPUT_DIR,
+        metric = None,
     ):
         super().__init__(
             model,
@@ -29,7 +30,8 @@ class CBLUETrainer(NCBITrainer):
             task_name,
             my_model_name,
             is_roberta,
-            output_dir=output_dir
+            output_dir=output_dir,
+            metric = metric,
         )
 
     def unpack_data_item(self, item):

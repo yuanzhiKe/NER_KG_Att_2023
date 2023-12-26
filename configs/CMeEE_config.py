@@ -15,3 +15,4 @@ MAX_GRAD_NORM = 1.0
 EARLYSTOP_PATIENCE = 5000
 model_name = "bert-base-uncased"
 OUTPUT_DIR = "cmeee_log/"
+TASK_DATA_DIR = "datasets/CMeEE-V2/"

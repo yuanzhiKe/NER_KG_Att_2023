@@ -30,6 +30,9 @@ from datetime import datetime
 def macro_f1(preds, labels):
     return precision_recall_fscore_support(y_pred=preds, y_true=labels, average='macro')
 
+def micro_f1(preds, labels):
+    return precision_recall_fscore_support(y_pred=preds, y_true=labels, average='micro')
+
 class NCBITrainer(object):
     def __init__(
         self,
@@ -40,7 +43,8 @@ class NCBITrainer(object):
         task_name,
         my_model_name,
         is_roberta=False,
-        output_dir = OUTPUT_DIR
+        output_dir = OUTPUT_DIR,
+        metric = None,
     ):
         self.model = model
         self.tokenizer = tokenizer
@@ -50,6 +54,13 @@ class NCBITrainer(object):
         self.my_model_name = my_model_name
         self.is_roberta = is_roberta
         self.output_dir = output_dir
+        if metric is None or metric == "macro":
+            self.metric = macro_f1
+        elif metric == "micro":
+            self.metric = micro_f1
+        else:
+            raise Exception("Not a supported metric.")
+        self.metric_word = metric
 
     def train(self):
         model = self.model
@@ -275,14 +286,9 @@ class NCBITrainer(object):
                     output_text += "\n\n"
                 f.write(output_text)
 
-        p, r, f1, _ = macro_f1(preds, eval_labels)
+        p, r, f1, _ = self.metric(preds, eval_labels)
         logging.info(
-            "%s-%s precision: %s - recall: %s - macro f1 score: %s",
-            self.task_name,
-            self.my_model_name,
-            p,
-            r,
-            f1,
+            f"{self.task_name}-{self.my_model_name} precision: {p} - recall: {r} - {self.metric_word} f1 score: {f1}",
         )
         return f1
 

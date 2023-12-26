@@ -73,7 +73,7 @@ class EN_Ontology(Ontology):
             "operational requirements", parent="medical equipment"
         )
 
-        ontology_tree.create_node("body", "anatomical location", parent="root")
+        ontology_tree.create_node("anatomical location", "anatomical location", parent="root")
         ontology_tree.create_node("part name", parent="anatomical location")
         ontology_tree.create_node("anatomy", parent="anatomical location")
         ontology_tree.create_node("anatomical property", parent="anatomical location")
@@ -164,4 +164,4 @@ if __name__=="__main__":
     tree = EN_Ontology()
     print(tree.tree)
     print(tree.get_dfs_encoded_str())
-    # print(tree.get_pre_post_order_encoded_str())
+    print(tree.get_post_order_encoded_str())
