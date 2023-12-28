@@ -1,5 +1,9 @@
 # Ontology Attention
 
+To improve a BERT-based model's NER performance for clinical texts.
+
+A paper about this project is wating for publishing. We will update the citition information after publication.
+
 ## Usage
 
 ### Requirements
